@@ -1,0 +1,39 @@
+### Android ###
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Signing configs — never commit keystores or signing properties
+*.jks
+*.keystore
+keystore.properties
+release.properties
+
+# Firebase — google-services.json contains API keys, add via CI secret
+# google-services.json   <-- intentionally NOT ignored so you can commit debug config
+#                            but do NOT commit production keys
+
+# IntelliJ / Android Studio
+*.iws
+*.ipr
+out/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

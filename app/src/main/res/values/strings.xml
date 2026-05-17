@@ -1,0 +1,58 @@
+<resources>
+    <string name="app_name">TapFlow</string>
+
+    <!-- Home -->
+    <string name="tap">TAP</string>
+    <string name="save_and_reset">Save &amp; Reset</string>
+    <string name="new_record">New Record!</string>
+    <string name="matching_record">Matching Best: %d</string>
+
+    <!-- Stats -->
+    <string name="stats_title">Statistics</string>
+    <string name="total_taps">Total Taps</string>
+    <string name="best_session">Best Session</string>
+    <string name="sessions">Sessions</string>
+    <string name="average">Avg / Session</string>
+    <string name="clear_stats">Clear All Stats</string>
+    <string name="clear_confirm_title">Clear All Stats?</string>
+    <string name="clear_confirm_message">This will permanently delete all your tap history and statistics.</string>
+    <string name="clear_confirm_yes">Clear</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- History -->
+    <string name="history_title">History</string>
+    <string name="no_history">No Sessions Yet</string>
+    <string name="no_history_hint">Tap the button and save a session\nto see your history here.</string>
+
+    <!-- Navigation -->
+    <string name="nav_counter">Counter</string>
+    <string name="nav_stats">Stats</string>
+    <string name="nav_history">History</string>
+
+    <!-- Build & Updates -->
+    <string name="home_build_section_title">Build &amp; Updates</string>
+    <string name="home_build_section_body">Trigger a new CI/CD build from inside the app. Builds are distributed via Firebase App Distribution to the testers group.</string>
+    <string name="home_build_installed_label">Installed version:</string>
+    <string name="home_build_latest_label">Latest GitHub release:</string>
+    <string name="home_build_last_run_label">Last build run:</string>
+    <string name="home_build_pat_hint">GitHub Personal Access Token (workflow scope)</string>
+    <string name="home_build_save_pat">Save PAT</string>
+    <string name="home_build_pat_saved">PAT saved.</string>
+    <string name="home_build_pat_missing">Add a GitHub PAT below to enable Push.</string>
+    <string name="home_build_pat_help">Generate at github.com/settings/tokens with Actions: read &amp; write.</string>
+    <string name="home_build_push_button">Push (Trigger Build)</string>
+    <string name="home_build_refresh_button">Refresh</string>
+    <string name="home_build_open_actions">Open Actions</string>
+    <string name="home_build_loading">Loading…</string>
+    <string name="home_build_push_triggered">Build triggered. Watch status below.</string>
+    <string name="home_build_push_failed">Could not trigger build: %1$s</string>
+    <string name="home_build_status_running">in progress · %1$s</string>
+    <string name="home_build_status_success">success · %1$s</string>
+    <string name="home_build_status_failed">FAILED · %1$s (%2$s)</string>
+    <string name="home_build_status_cancelled">cancelled · %1$s</string>
+    <string name="home_build_status_queued">queued · %1$s</string>
+    <string name="home_build_status_error">error: %1$s</string>
+    <string name="home_build_status_no_runs">no runs yet</string>
+    <string name="home_build_update_available">⬇ update available</string>
+    <string name="home_build_up_to_date">✓ up to date</string>
+</resources>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- iOS System Colors -->
+    <color name="ios_blue">#007AFF</color>
+    <color name="ios_green">#34C759</color>
+    <color name="ios_red">#FF3B30</color>
+    <color name="ios_orange">#FF9500</color>
+    <color name="ios_yellow">#FFCC00</color>
+    <color name="ios_purple">#AF52DE</color>
+    <color name="ios_teal">#5AC8FA</color>
+
+    <!-- iOS Semantic Colors (Light Mode) -->
+    <color name="ios_background">#F2F2F7</color>
+    <color name="ios_surface">#FFFFFF</color>
+    <color name="ios_label">#000000</color>
+    <color name="ios_secondary_label">#6D6D72</color>
+    <color name="ios_tertiary_label">#AEAEB2</color>
+    <color name="ios_separator">#C6C6C8</color>
+    <color name="ios_gray">#8E8E93</color>
+    <color name="ios_gray2">#AEAEB2</color>
+
+    <!-- Primitives -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <!-- Badge backgrounds (semi-transparent) -->
+    <color name="badge_green_bg">#2034C759</color>
+    <color name="badge_orange_bg">#20FF9500</color>
+</resources>
