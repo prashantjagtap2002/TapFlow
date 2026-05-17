@@ -1,0 +1,308 @@
+==============================================================
+  TAPFLOW — HOW TO RUN, SET UP SECRETS, AND USE CI/CD
+==============================================================
+
+
+--------------------------------------------------------------
+PART 0: HOW THE WHOLE SYSTEM WORKS (SIMPLE EXPLANATION)
+--------------------------------------------------------------
+
+WHAT IS CI/CD?
+  CI/CD stands for Continuous Integration / Continuous Delivery.
+  In simple words: every time you push code to GitHub, a robot
+  automatically builds your app and sends it to testers.
+  You don't have to manually build or share the APK.
+
+--------------------------------------------------------------
+THE FLOW — STEP BY STEP (WHAT HAPPENS BEHIND THE SCENES)
+--------------------------------------------------------------
+
+  YOU                GITHUB               GITHUB ACTIONS        FIREBASE
+  ---                ------               --------------        --------
+  Write code   -->   Stores your code --> Detects new push  --> Sends APK
+  Push to GitHub     in the repo          Runs build.yml        to testers
+                                          Builds the APK        via email
+
+Step 1 — YOU WRITE CODE AND PUSH
+  You write code in Android Studio and run "git push".
+  Your code goes to GitHub (like a cloud folder for code).
+
+Step 2 — GITHUB DETECTS THE PUSH
+  GitHub sees that new code arrived on the "main" branch.
+  It automatically triggers the workflow file: .github/workflows/build.yml
+  Think of build.yml as a to-do list of instructions for the robot.
+
+Step 3 — GITHUB ACTIONS (THE ROBOT) RUNS
+  GitHub spins up a fresh Linux computer in the cloud (ubuntu-latest).
+  On that computer, it follows the build.yml instructions:
+    a) Download your code (checkout)
+    b) Install Java 17 (needed to build Android apps)
+    c) Run "./gradlew assembleDebug" — this builds the APK file
+    d) Save the APK as a downloadable artifact on GitHub
+    e) Send the APK to Firebase App Distribution
+
+Step 4 — FIREBASE SENDS THE APP TO TESTERS
+  Firebase receives the APK and emails everyone in the "testers" group.
+  Testers click the link in the email and install the app on their phone.
+  No Play Store needed — Firebase handles the delivery directly.
+
+--------------------------------------------------------------
+HOW THE SECRETS WORK
+--------------------------------------------------------------
+
+  The robot (GitHub Actions) needs permission to talk to Firebase.
+  But you can't write passwords directly in your code (anyone can see it).
+  So you store them as "Secrets" in GitHub Settings.
+
+  FIREBASE_APP_ID
+    → Tells Firebase WHICH app to upload to.
+    → Like an address: "send this APK to the TapFlow app in Firebase."
+
+  FIREBASE_SERVICE_CREDENTIALS
+    → Proves to Firebase that GitHub Actions is allowed to upload.
+    → Like a key card: "I am an authorized robot, let me in."
+
+  When the workflow runs, GitHub secretly passes these values
+  to the robot — the values are never visible in any logs.
+
+--------------------------------------------------------------
+HOW THE PERSONAL ACCESS TOKEN (PAT) FITS IN
+--------------------------------------------------------------
+
+  The GitHub PAT is YOUR identity token.
+  It proves to GitHub that you (a human) are allowed to:
+    - Push code to the repository
+    - Create releases
+    - Manage workflow secrets
+
+  When you enter the PAT in an app or tool, that tool can
+  act on your behalf on GitHub — like giving someone your
+  key to your house so they can deliver something inside.
+
+  The PAT starts with "ghp_" and is shown ONLY ONCE when
+  you create it. After that GitHub hides it forever.
+
+--------------------------------------------------------------
+HOW THE PROJECT WAS CREATED (SUMMARY)
+--------------------------------------------------------------
+
+  1. App code written in Kotlin using Android Studio
+  2. Git repository created and pushed to GitHub
+  3. build.yml workflow file written — defines the robot's instructions
+  4. Firebase project created, Android app registered inside it
+  5. Firebase App ID and Service Account key obtained from Firebase
+  6. Both stored as encrypted secrets in GitHub repository settings
+  7. Every push to "main" now automatically builds + distributes the app
+
+--------------------------------------------------------------
+THE FILES THAT MAKE IT ALL WORK
+--------------------------------------------------------------
+
+  TapFlow/
+  ├── .github/workflows/build.yml   ← the robot's instruction list
+  ├── gradle/wrapper/
+  │   └── gradle-wrapper.jar        ← lets the robot run Gradle builds
+  ├── gradle.properties             ← tells Gradle to use AndroidX libraries
+  └── app/build.gradle.kts          ← defines what the app is and its deps
+
+==============================================================
+
+--------------------------------------------------------------
+PART 1: OPEN THE APP IN ANDROID STUDIO
+--------------------------------------------------------------
+
+1. Open Android Studio.
+
+2. Click "File" > "Open" and navigate to:
+      C:\Users\prash\AndroidStudioProjects\TapFlow
+
+3. Click OK. Android Studio will sync Gradle automatically.
+   Wait for "Gradle sync finished" in the bottom status bar.
+
+   IMPORTANT NOTE ABOUT gradle-wrapper.jar:
+   The file gradle/wrapper/gradle-wrapper.jar is a binary that
+   cannot be generated as text. Android Studio will download it
+   automatically on first sync. If it doesn't, do this once:
+     a) Open a terminal inside Android Studio (View > Terminal)
+     b) Run: gradle wrapper --gradle-version 8.9
+
+4. Connect your Android phone via USB (enable USB Debugging:
+   Settings > Developer Options > USB Debugging = ON)
+   OR start an emulator from the AVD Manager.
+
+5. Click the green "Run" button (Shift+F10) to build and
+   install the app on your device.
+
+
+--------------------------------------------------------------
+PART 2: CREATE A GITHUB REPO AND PUSH YOUR CODE
+--------------------------------------------------------------
+
+1. Go to https://github.com and create a new EMPTY repository
+   named "TapFlow" (do NOT add README or .gitignore — we have one).
+
+2. Open a terminal, navigate to the TapFlow folder:
+      cd C:\Users\prash\AndroidStudioProjects\TapFlow
+
+3. Run these commands (replace YOUR_USERNAME with your GitHub username):
+
+      git init
+      git add .
+      git commit -m "Initial TapFlow project"
+      git branch -M main
+      git remote add origin https://github.com/YOUR_USERNAME/TapFlow.git
+      git push -u origin main
+
+4. After pushing, go to your GitHub repo and click the "Actions" tab.
+   You will see the workflow run automatically. It will FAIL at the
+   Firebase step because secrets are not set yet — that's expected.
+
+
+--------------------------------------------------------------
+PART 3: SET UP FIREBASE APP DISTRIBUTION
+--------------------------------------------------------------
+
+STEP A — Create a Firebase project:
+1. Go to https://console.firebase.google.com
+2. Click "Add project" > name it "TapFlow" > Continue
+3. Disable Google Analytics (optional) > Create project
+
+STEP B — Register your Android app:
+1. Inside the Firebase project, click the Android icon (+)
+2. Package name: com.tapflow.app.debug   <-- USE THIS EXACTLY
+   (the debug build appends ".debug" to the base package)
+3. App nickname: TapFlow Debug
+4. Skip the google-services.json step (not needed for distribution)
+5. Click "Continue" through the remaining steps
+
+STEP C — Enable App Distribution:
+1. In the left sidebar go to: Release & Monitor > App Distribution
+2. Click "Get started"
+3. Go to the "Testers & Groups" tab
+4. Click "Add group" > name it exactly: testers
+5. Click "Add testers" > enter YOUR email address > Save
+
+STEP D — Get your Firebase App ID:
+1. In Firebase console, click the gear icon > Project settings
+2. Scroll down to "Your apps" section
+3. Find your app and copy the "App ID"
+   It looks like: 1:123456789012:android:abcdef1234567890
+
+STEP E — Create a Service Account for CI/CD:
+1. Still in Project settings, click the "Service accounts" tab
+2. Click "Generate new private key"
+3. Click "Generate key" in the confirmation dialog
+4. A JSON file downloads to your computer — KEEP THIS SAFE
+5. Open the JSON file in any text editor (Notepad is fine)
+6. Select ALL the text (Ctrl+A) and copy it
+
+
+--------------------------------------------------------------
+PART 4: ADD SECRETS TO GITHUB
+--------------------------------------------------------------
+
+1. Go to your GitHub repo: https://github.com/YOUR_USERNAME/TapFlow
+
+2. Click: Settings > Secrets and variables > Actions
+
+3. Click "New repository secret" and add these TWO secrets:
+
+   SECRET 1:
+   Name:  FIREBASE_APP_ID
+   Value: 1:123456789012:android:abcdef1234567890
+          (paste your App ID from Firebase — Step D above)
+
+   SECRET 2:
+   Name:  FIREBASE_SERVICE_CREDENTIALS
+   Value: (paste the ENTIRE contents of the JSON file — Step E above)
+          It starts with { "type": "service_account", ...
+
+4. Both secrets are now saved. They are encrypted and hidden
+   from everyone including you after saving.
+
+
+--------------------------------------------------------------
+PART 5: TRIGGER THE FULL PIPELINE
+--------------------------------------------------------------
+
+1. Make any small change in Android Studio (e.g., add a comment
+   to MainActivity.kt or change the app version in build.gradle.kts)
+
+2. Commit and push:
+      git add .
+      git commit -m "Trigger pipeline test"
+      git push
+
+3. Go to GitHub > Actions tab. You should see a new workflow run.
+
+4. The pipeline will:
+   a) Check out your code
+   b) Set up JDK 17
+   c) Build the debug APK
+   d) Upload the APK as a downloadable artifact in GitHub Actions
+   e) Upload to Firebase App Distribution and notify testers
+
+5. Check your email — Firebase will send you a download link.
+   Click "Download latest build" and install on your phone.
+
+   NOTE: On first install from Firebase, your phone will ask you
+   to "Allow installs from unknown sources" for the Firebase
+   App Tester app. This is normal and safe.
+
+
+--------------------------------------------------------------
+PART 6: THE APP FEATURES
+--------------------------------------------------------------
+
+HOME TAB (Counter):
+  - Tap the big blue button to count
+  - A timer shows how long the current session has been running
+  - "New Record!" badge appears when you beat your best count
+  - "Save & Reset" saves the session to history and resets to 0
+  - The spring animation (shrink/expand) on tap is intentional
+
+STATS TAB:
+  - Total Taps: all-time cumulative tap count
+  - Best Session: most taps in a single session
+  - Sessions: total number of saved sessions
+  - Avg / Session: total taps divided by number of sessions
+  - "Clear All Stats" deletes everything (with confirmation dialog)
+
+HISTORY TAB:
+  - Shows all saved sessions (most recent first)
+  - Each row shows: date/time, duration, and tap count
+  - Up to 50 sessions are stored
+
+DATA STORAGE:
+  - All data is stored locally on your device using SharedPreferences
+  - No internet required to use the app
+  - Uninstalling the app will delete all stored data
+
+
+--------------------------------------------------------------
+PART 7: TROUBLESHOOTING
+--------------------------------------------------------------
+
+Problem: Gradle sync fails with "Could not find gradle-wrapper.jar"
+Fix: Open terminal in Android Studio and run: gradle wrapper --gradle-version 8.9
+
+Problem: "Firebase App not found" in GitHub Actions
+Fix: Double-check the FIREBASE_APP_ID secret matches exactly what
+     Firebase shows (no spaces, correct format).
+
+Problem: "Permission denied" for service account
+Fix: In Firebase console > Project settings > Service accounts,
+     make sure you generated the key from the correct project.
+
+Problem: App installs but crashes immediately
+Fix: Make sure you used package name "com.tapflow.app.debug" (with .debug)
+     when registering in Firebase. The debug build appends ".debug".
+     If you used "com.tapflow.app" (without .debug), re-register with
+     the correct package name.
+
+Problem: GitHub Actions fails on "assembleDebug" step
+Fix: Check the Actions log for the exact error. Common causes:
+     - Gradle version mismatch (check gradle-wrapper.properties)
+     - Kotlin version incompatibility (check libs.versions.toml)
+
+==============================================================
